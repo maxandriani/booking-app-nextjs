@@ -5,6 +5,7 @@ import { cookies, headers } from "next/headers";
 import { AuthenticationError, AuthorizationError, TokenExpiredError } from '@/services/auth/auth-errors';
 import { fetchAccessTokenByRefreshToken, fetchOpenidConfiguration } from '@/lib/oauth-client';
 import { cache } from 'react';
+import { trace } from '@opentelemetry/api';
 
 const SEVEN_DAYS_SECONDS = 7 * 60 * 60;
 const APP_AUTH_SESSION_SECRET = new TextEncoder().encode(process.env.APP_AUTH_SESSION_SECRET);
@@ -36,37 +37,51 @@ export interface CreateSession {
  * Get the current session if current access_token is valid, otherwise negotiates an new access_token or returns undefined if there are no session.
  */
 export const getServerSession = cache(async () => {
-    try {
-        const cookieStore = await cookies();
-        const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    return await trace
+        .getTracer('auth-service')
+        .startActiveSpan(getServerSession.name, async (span) => {
+            try {
+                const cookieStore = await cookies();
+                const sessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-        if (!sessionToken) return undefined;
+                if (!sessionToken) return undefined;
 
-        const { payload: user } = await jwtVerify<UserSession>(sessionToken, APP_AUTH_SESSION_SECRET);
-        const accessToken = await getAccessToken();
-        return { user, accessToken };
-    } catch (err) {
-        console.error(err);
-        return undefined;
-    }
+                const { payload: user } = await jwtVerify<UserSession>(sessionToken, APP_AUTH_SESSION_SECRET);
+                const accessToken = await getAccessToken();
+                return { user, accessToken };
+            } catch (err) {
+                console.error(err);
+                return undefined;
+            } finally {
+                span.end();
+            }
+        });
 });
 
 export async function createServerSession({ user, accessToken, accessTokenExpiresSeconds, refreshToken }: CreateSession) {
-    const sessionExpiresSeconds = SEVEN_DAYS_SECONDS;
-    const cookieStore = await cookies();
-    const sessionToken = await new SignJWT(user)
-        .setProtectedHeader({ alg: 'HS256' })
-        .setIssuedAt()
-        .setIssuer('urn:booking-app:sessions')
-        .setExpirationTime(Date.now() + (sessionExpiresSeconds * 1000))
-        .sign(APP_AUTH_SESSION_SECRET);
+    return await trace
+        .getTracer('auth-service')
+        .startActiveSpan(createServerSession.name, async (span) => {
+            try {
+                const sessionExpiresSeconds = SEVEN_DAYS_SECONDS;
+                const cookieStore = await cookies();
+                const sessionToken = await new SignJWT(user)
+                    .setProtectedHeader({ alg: 'HS256' })
+                    .setIssuedAt()
+                    .setIssuer('urn:booking-app:sessions')
+                    .setExpirationTime(Date.now() + (sessionExpiresSeconds * 1000))
+                    .sign(APP_AUTH_SESSION_SECRET);
 
-    cookieStore.set(SESSION_COOKIE_NAME, sessionToken, { httpOnly: true, maxAge: sessionExpiresSeconds, path: `/`, sameSite: 'lax' });
-    cookieStore.set(ACCESS_TOKEN_COOKIE_NAME, accessToken, { httpOnly: true, maxAge: accessTokenExpiresSeconds, path: `/`, sameSite: 'lax' });
+                cookieStore.set(SESSION_COOKIE_NAME, sessionToken, { httpOnly: true, maxAge: sessionExpiresSeconds, path: `/`, sameSite: 'lax' });
+                cookieStore.set(ACCESS_TOKEN_COOKIE_NAME, accessToken, { httpOnly: true, maxAge: accessTokenExpiresSeconds, path: `/`, sameSite: 'lax' });
 
-    if (!!refreshToken) {
-        cookieStore.set(REFRESH_TOKEN_COOKIE_NAME, refreshToken, { httpOnly: true, maxAge: sessionExpiresSeconds, path: `/`, sameSite: 'lax' });
-    }
+                if (!!refreshToken) {
+                    cookieStore.set(REFRESH_TOKEN_COOKIE_NAME, refreshToken, { httpOnly: true, maxAge: sessionExpiresSeconds, path: `/`, sameSite: 'lax' });
+                }
+            } finally {
+                span.end();
+            }
+        });
 }
 
 export async function destroyServerSession() {
