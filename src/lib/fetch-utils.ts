@@ -1,12 +1,21 @@
 import { getAuthorizationHeaders } from "@/services/auth/auth-service";
 
-export function createUrl(path: string, base?: string, queryParams?: { [key: string]: string | string[] }): URL {
+export interface PaginationQuery {
+    page?: number;
+    pageSize?: number;
+}
+
+export interface SortQuery {
+    sortBy?: string;
+}
+
+export function createUrl(path: string, base?: string, queryParams?: { [key: string]: string | string[] | undefined }): URL {
     const fetchUrl = new URL(path, base);
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
             if (Array.isArray(value)) {
                 value.forEach(x => fetchUrl.searchParams.append(key, x));
-            } else {
+            } else if (value !== undefined) {
                 fetchUrl.searchParams.set(key, value);
             }
         }
