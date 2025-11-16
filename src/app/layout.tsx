@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AppThemeProvider from "@/components/layout/app-theme-provider";
-import { AuthenticationProvider } from "@/hooks/use-authentication";
 
 export const metadata: Metadata = {
   title: "Controle de reservas",
@@ -16,15 +15,13 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body>
-        <AuthenticationProvider>
-          <AppThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-          >
-            {children}
-          </AppThemeProvider>
-        </AuthenticationProvider>
+        <AppThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          {children}
+        </AppThemeProvider>
       </body>
     </html>
   );
