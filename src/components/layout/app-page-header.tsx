@@ -7,9 +7,9 @@ export interface AppPageHeaderProps {
 
 export default function AppPageHeader({ children }: AppPageHeaderProps) {
     return (
-        <header className="flex gap-4 items-center p-2 pl-4 pr-4 border-b">
+        <header className="flex gap-4 items-center justify-center p-2 pl-4 pr-4 border-b">
             <SidebarTrigger />
-            <div className="flex flex-1 align-middle items-center gap-2 p-0 pl-4 pr-4 min-h-12">
+            <div className="flex flex-1 align-middle items-center justify-center gap-2 p-0 pl-4 pr-4 min-h-12">
                 {children}
             </div>
         </header>

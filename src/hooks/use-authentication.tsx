@@ -18,7 +18,7 @@ export interface AuthenticationProviderProps extends PropsWithChildren {
     session: Session;
 }
 
-export const AuthenticationContext = createContext<ClientSessionWithActions | undefined>(undefined);
+const AuthenticationContext = createContext<ClientSessionWithActions | undefined>(undefined);
 
 export function useAuthentication(): ClientSessionWithActions {
     const context = useContext(AuthenticationContext);

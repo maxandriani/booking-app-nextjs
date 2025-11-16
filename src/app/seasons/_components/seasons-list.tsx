@@ -6,9 +6,10 @@ import { Edit } from "lucide-react";
 import Link from "next/link";
 import { startTransition, useState, ViewTransition } from "react";
 import DeleteSeasonButton from "./delete-season-button";
-import { deleteSeasonById, searchSeasons } from "@/services/seasons/season-service";
+import { deleteSeasonById, searchSeasons, Season } from "@/services/seasons/season-service";
 import useSWR from "swr";
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 export function SeasonsList() {
   const [activeItems, setActiveItems] = useState<Set<string>>(new Set());
@@ -20,16 +21,17 @@ export function SeasonsList() {
     { suspense: true, fallbackData: [] }
   );
 
-  async function handleDeleteSeason(seasonId: string) {
-    startTransition(() => setActiveItems(new Set(activeItems).add(seasonId)));
+  async function handleDeleteSeason(season: Season) {
+    startTransition(() => setActiveItems(new Set(activeItems).add(season.id)));
     try {
-      await deleteSeasonById(seasonId);
+      await deleteSeasonById(season.id);
       await mutate();
+      toast.success(`Temporada ${season.name} removida com sucesso!`)
     } catch (err) {
-      alert((err as Error).message);
+      toast.error(`Erro ao remove ${season.name}!`, { description: (err as Error).message });
     } finally {
       const newActiveItems = new Set(activeItems);
-      newActiveItems.delete(seasonId);
+      newActiveItems.delete(season.id);
       startTransition(() => {
         setActiveItems(newActiveItems);
       });
@@ -69,7 +71,7 @@ export function SeasonsList() {
                     <Edit />
                   </Link>
                 </Button>
-                <DeleteSeasonButton onCLick={() => handleDeleteSeason(season.id)} disabled={activeItems.has(season.id)} active={activeItems.has(season.id)} />
+                <DeleteSeasonButton onCLick={() => handleDeleteSeason(season)} disabled={activeItems.has(season.id)} active={activeItems.has(season.id)} />
               </ItemActions>
             </Item>
             <ItemSeparator />
