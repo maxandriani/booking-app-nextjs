@@ -16,7 +16,7 @@ export type AppSidebarProps = {
 
 export default function AppSidebar({ ...props }: AppSidebarProps) {
     const pathname = usePathname();
-    const { user, status } = useAuthentication();
+    const { user } = useAuthentication();
 
     function isCurrentPath(path: string): boolean {
         return pathname.startsWith(path);
@@ -28,7 +28,7 @@ export default function AppSidebar({ ...props }: AppSidebarProps) {
                 <span className="text-lg">Controle de Reservas</span>
             </SidebarHeader>
             <SidebarContent>
-                {status === 'completed' && !!user && <>
+                {!!user && <>
                     <SidebarGroup>
                         <SidebarGroupContent>
                             <SidebarMenu>

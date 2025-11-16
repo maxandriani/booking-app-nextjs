@@ -1,13 +1,12 @@
 'use client';
 
 import { loginAction, logoutAction } from "@/actions/auth";
-import { getServerSession, UserSession } from "@/services/auth/auth-service";
+import { Session, UserSession } from "@/services/auth/auth-service";
 import { usePathname } from "next/navigation";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, PropsWithChildren, useCallback, useContext } from "react";
 
 export interface ClientSession {
     user?: UserSession;
-    status: 'initializing' | 'completed'
 }
 
 export interface ClientSessionWithActions extends ClientSession {
@@ -15,11 +14,11 @@ export interface ClientSessionWithActions extends ClientSession {
     signOut(): Promise<void>;
 }
 
-export interface AuthenticationProviderProps {
-    children?: ReactNode;
+export interface AuthenticationProviderProps extends PropsWithChildren {
+    session: Session;
 }
 
-export const AuthenticationContext = createContext<ClientSessionWithActions | undefined>(undefined);
+const AuthenticationContext = createContext<ClientSessionWithActions | undefined>(undefined);
 
 export function useAuthentication(): ClientSessionWithActions {
     const context = useContext(AuthenticationContext);
@@ -27,34 +26,19 @@ export function useAuthentication(): ClientSessionWithActions {
     return context;
 }
 
-export function AuthenticationProvider({ children }: AuthenticationProviderProps) {
+export function AuthenticationProvider({ children, session: { user } }: AuthenticationProviderProps) {
     const path = usePathname();
-    const [{ user, status }, setValue] = useState<ClientSession>({ status: 'initializing' });
 
     const signIn = useCallback(async () => {
-        setValue({ status: 'initializing' });
         loginAction(path);
     }, [path]);
 
     const signOut = useCallback(async () => {
-        setValue({ status: 'completed' });
         logoutAction();
-    }, [setValue]);
-
-    useEffect(() => {
-        getServerSession()
-            .then(session => {
-                if (!!session) {
-                    const { user } = session;
-                    setValue({ user, status: 'completed' });
-                } else {
-                    setValue({ status: `completed` });
-                }
-            });
-    }, [status])
+    }, []);
 
     return (
-        <AuthenticationContext.Provider value={{ user, status, signIn, signOut }}>
+        <AuthenticationContext.Provider value={{ user, signIn, signOut }}>
             {children}
         </AuthenticationContext.Provider>
     )

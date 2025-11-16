@@ -116,7 +116,69 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes move-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes move-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 
+::view-transition-group(.slide-in) { }
+*/
+
+::view-transition-old(.move-out) {
+  overflow: hidden;
+  animation: move-out 0.4s ease-in both;
+}
+
+::view-transition-new(.move-out) {
+  overflow: hidden;
+  animation: move-in 0.4s ease-out both;
+}
+
+::view-transition-new(.move-in) {
+  overflow: hidden;
+  animation: move-in 0.4s ease-out both;
+}
+
+::view-transition-new(.blink) {
+  animation: blink 0.2s ease-in-out both;
 }

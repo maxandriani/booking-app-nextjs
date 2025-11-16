@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AppThemeProvider from "@/components/layout/app-theme-provider";
-import { AuthenticationProvider } from "@/hooks/use-authentication";
+import { Toaster } from "sonner";
+import { ViewTransition } from "react";
 
 export const metadata: Metadata = {
   title: "Controle de reservas",
@@ -16,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body>
-        <AuthenticationProvider>
+        <ViewTransition name="app-layout" enter="slide-in">
           <AppThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -24,7 +25,8 @@ export default function RootLayout({
           >
             {children}
           </AppThemeProvider>
-        </AuthenticationProvider>
+        </ViewTransition>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

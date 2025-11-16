@@ -6,19 +6,18 @@ import AppPageTitle from "@/components/layout/app-page-title";
 import AppThemeToggle from "@/components/layout/app-theme-toggle";
 import { AuthenticationProvider } from "@/hooks/use-authentication";
 
-export default async function Home() {
-
-  const session = await requiresAuthenticationPolicy('/');
-
+export default async function ProfilePage() {
+  const session = await requiresAuthenticationPolicy('/profile');
   return (
     <AuthenticationProvider session={session}>
       <AppLayout>
         <AppPageHeader>
-          <AppPageTitle>Gerenciador de Reservas</AppPageTitle>
+          <AppPageTitle>Bem vindo, {session.user.firstName}!</AppPageTitle>
           <AppThemeToggle />
         </AppPageHeader>
         <AppPageContent>
-          <p>Bem vindo {session.user.firstName}</p>
+          <p>Esta é a sua página de perfil.</p>
+          <pre>{JSON.stringify(session, null, 2)}</pre>
         </AppPageContent>
       </AppLayout>
     </AuthenticationProvider>
