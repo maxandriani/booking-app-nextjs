@@ -38,7 +38,7 @@ export default function SeasonsFilter({ search }: SeasonsFilterProps) {
 
   return (
     <form onSubmit={handleSubmit(onFilterSubmit)}>
-      <FieldGroup className="flex w-full flex-row flex-1 align-middle items-center">
+      <FieldGroup className="flex w-full flex-row flex-1 align-middle items-center gap-2">
         <Field>
           <div className="relative flex items-center">
             <Input id="search" placeholder="Pesquisar..." defaultValue={search} {...register("search")}></Input>

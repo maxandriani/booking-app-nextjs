@@ -6,20 +6,18 @@ import AppThemeToggle from "@/components/layout/app-theme-toggle";
 import { Metadata } from "next";
 import { Suspense, ViewTransition } from "react";
 import { SeasonsList } from "./_components/seasons-list";
-import { Card, CardContent } from "@/components/ui/card";
 import { requiresAuthenticationPolicy } from "@/actions/auth";
 import { AuthenticationProvider } from "@/hooks/use-authentication";
-import SeasonsFilter from "./_components/seasons-filter";
 import SeasonsListPLaceholder from "./_components/seasons-list-placeholder";
+import SeasonsActionBar from "./_components/seasons-action-bar";
 
 export const metadata: Metadata = {
   title: "Cadastro de Temporadas",
   description: "Cadastre ou gerencie as temporadas de reservas.",
 };
 
-export default async function SeasonsPage({ searchParams }: PageProps<'/seasons'>) {
+export default async function SeasonsPage({ }: PageProps<'/seasons'>) {
   const session = await requiresAuthenticationPolicy('/seasons');
-  const { search } = await searchParams;
 
   return (
     <AuthenticationProvider session={session}>
@@ -29,11 +27,7 @@ export default async function SeasonsPage({ searchParams }: PageProps<'/seasons'
           <AppThemeToggle />
         </AppPageHeader>
         <AppPageContent>
-          <Card>
-            <CardContent>
-              <SeasonsFilter search={search?.toString()} />
-            </CardContent>
-          </Card>
+          <SeasonsActionBar />
           <ViewTransition enter="fade-in">
             <Suspense fallback={<SeasonsListPLaceholder />}>
               <SeasonsList />

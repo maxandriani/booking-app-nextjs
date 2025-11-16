@@ -70,10 +70,10 @@ export default function UpdateSeasonForm({ season, disabled, errors }: SeasonFor
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <Field>
+            <Field data-invalid={!!fieldErrors.name}>
               <FieldLabel>Nome</FieldLabel>
-              <Input type="text" {...register("name", { required: true, maxLength: 255 })} placeholder="Temporada ..." defaultValue={season.name} disabled={disabled || isSubmitting || isRemoving} />
               {fieldErrors.name && <FieldError>{fieldErrors.name.message}</FieldError>}
+              <Input type="text" aria-invalid={!!fieldErrors.name} {...register("name", { required: "Campo requerido.", maxLength: 255 })} placeholder="Temporada ..." defaultValue={season.name} disabled={disabled || isSubmitting || isRemoving} />
             </Field>
           </FieldGroup>
         </CardContent>
