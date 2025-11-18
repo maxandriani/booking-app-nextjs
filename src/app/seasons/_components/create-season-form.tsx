@@ -1,11 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import SaveButton from "@/components/layout/save-button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { createSeason, CreateSeason } from "@/services/seasons/season-service";
-import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -20,11 +19,11 @@ function isSeasonMutateKey(key: unknown): boolean {
 }
 
 export default function CreateSeasonForm() {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CreateSeason>();
+  const { register, handleSubmit, formState: { errors, isSubmitting, isValid } } = useForm<CreateSeason>();
   const router = useRouter();
 
-  async function updateSeason(data: CreateSeason, e) {
-    e.preventDefault();
+  async function updateSeason(data: CreateSeason, e?: React.BaseSyntheticEvent) {
+    e?.preventDefault();
     try {
       await createSeason(data);
       await mutate(isSeasonMutateKey);
@@ -48,18 +47,11 @@ export default function CreateSeasonForm() {
           </FieldGroup>
         </CardContent>
         <CardFooter>
-          <FieldGroup orientation="horizontal">
-            <Field className="w-fit">
-              <Button type="submit" disabled={isSubmitting}>
-                {!!isSubmitting
-                  ? <>
-                    <Loader2Icon className="animate-spin" />
-                    <span>Salvando...</span>
-                  </>
-                  : <span>Salvar</span>}
-              </Button>
-            </Field>
-          </FieldGroup>
+          <Field orientation="horizontal">
+            <SaveButton type="submit" disabled={isSubmitting || !isValid} active={isSubmitting} className="w-fit">
+              {!!isSubmitting ? <span>Salvando...</span> : <span>Salvar</span>}
+            </SaveButton>
+          </Field>
         </CardFooter>
       </Card>
     </form>

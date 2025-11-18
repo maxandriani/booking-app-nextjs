@@ -5,7 +5,7 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { CreateSeason, deleteSeasonById, Season, updateSeasonById } from "@/services/seasons/season-service";
-import { Loader2Icon, TrashIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 import { FieldErrors, useForm } from "react-hook-form";
@@ -27,7 +27,7 @@ function isSeasonMutateKey(key: unknown): boolean {
 }
 
 export default function UpdateSeasonForm({ season, disabled, errors }: SeasonFormProps) {
-  const { register, handleSubmit, formState: { errors: fieldErrors, isSubmitting } } = useForm<CreateSeason>({ errors });
+  const { register, handleSubmit, formState: { errors: fieldErrors, isSubmitting, isValid } } = useForm<CreateSeason>({ errors });
   const [isRemoving, setIsRemoving] = useState(false);
   const router = useRouter();
 
@@ -78,20 +78,13 @@ export default function UpdateSeasonForm({ season, disabled, errors }: SeasonFor
           </FieldGroup>
         </CardContent>
         <CardFooter>
-          <FieldGroup orientation="horizontal">
-            <Field className="w-fit">
-              <Button type="submit" disabled={disabled || isSubmitting || isRemoving}>
-                {!!isSubmitting
-                  ? <>
-                    <Loader2Icon className="animate-spin" />
-                    <span>Salvando...</span>
-                  </>
-                  : <span>Salvar</span>}
-              </Button>
-            </Field>
-          </FieldGroup>
+          <Field orientation="horizontal">
+            <Button className="w-fit" type="submit" disabled={disabled || isSubmitting || isRemoving || !isValid}>
+              {!!isSubmitting ? <span>Salvando...</span> : <span>Salvar</span>}
+            </Button>
+          </Field>
         </CardFooter>
       </Card>
-    </form>
+    </form >
   )
 }

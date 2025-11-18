@@ -7,10 +7,9 @@ import { FilterIcon, PlusCircleIcon, RefreshCcwIcon } from "lucide-react";
 import Link from "next/link";
 import { useState, ViewTransition } from "react";
 import SeasonsFilter from "./seasons-filter";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function SeasonsActionBar() {
-  const searchParams = useSearchParams();
   const [showSearchBar, setShowSearchBar] = useState(false);
   const router = useRouter();
 
@@ -39,7 +38,7 @@ export default function SeasonsActionBar() {
         {!!showSearchBar && (
           <Card className="p-3">
             <CardContent className="p-0">
-              <SeasonsFilter search={searchParams.get("search")?.toString()} />
+              <SeasonsFilter />
             </CardContent>
           </Card>)}
       </ViewTransition>
