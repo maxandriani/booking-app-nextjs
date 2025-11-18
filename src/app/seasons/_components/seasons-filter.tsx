@@ -3,19 +3,16 @@
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { SearchSeasonsQuery } from "@/services/seasons/season-service";
 import { Search, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { startTransition } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 
-export interface SeasonsFilterProps {
-  search?: string;
-}
-
-export default function SeasonsFilter({ search }: SeasonsFilterProps) {
+export default function SeasonsFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { register, handleSubmit, setValue, getValues } = useForm();
+  const { register, handleSubmit, setValue, getValues } = useForm<SearchSeasonsQuery>();
 
   function onFilterSubmit(data: FieldValues) {
     startTransition(() => {
@@ -41,7 +38,7 @@ export default function SeasonsFilter({ search }: SeasonsFilterProps) {
       <FieldGroup className="flex w-full flex-row flex-1 align-middle items-center gap-2">
         <Field>
           <div className="relative flex items-center">
-            <Input id="search" placeholder="Pesquisar..." defaultValue={search} {...register("search")}></Input>
+            <Input id="search" placeholder="Pesquisar..." defaultValue={searchParams.get("search")?.toString()} {...register("search")}></Input>
             {!!getValues("search") && (<Button variant="ghost" size="icon" className="absolute right-1" type="button" onClick={() => setValue("search", "")}>
               <X className="h-4 w-4" />
             </Button>)}

@@ -16,9 +16,8 @@ export const metadata: Metadata = {
   description: "Criar uma nova temporada.",
 };
 
-export default async function SeasonDetailPage({ params }: PageProps<'/seasons/[seasonId]'>) {
-  const { seasonId } = await params;
-  const session = await requiresAuthenticationPolicy(`/seasons/${seasonId}`);
+export default async function SeasonDetailPage({ }: PageProps<'/seasons/new'>) {
+  const session = await requiresAuthenticationPolicy(`/seasons/new`);
 
   return (
     <AuthenticationProvider session={session}>
