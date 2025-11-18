@@ -1,8 +1,8 @@
 import { getAuthorizationHeaders } from "@/services/auth/auth-service";
 
 export interface PaginationQuery {
-    page?: number;
-    pageSize?: number;
+    page?: string;
+    pageSize?: string;
 }
 
 export interface SortQuery {
